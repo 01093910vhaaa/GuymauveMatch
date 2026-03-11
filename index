@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guy-Mauve tente sa chance</title>
+  <style>
+    :root {
+      --bg1: #5a3856;
+      --bg2: #1c1220;
+      --bg3: #0c0810;
+      --panel: rgba(255,255,255,.06);
+      --panel-2: rgba(255,255,255,.08);
+      --border: rgba(255,255,255,.12);
+      --text: #f7f3fb;
+      --muted: rgba(247,243,251,.65);
+      --accent: #d660b8;
+      --accent-2: #f0b0df;
+      --good: #74d7a7;
+      --bad: #ff8a9b;
+      --gold: #f6d27a;
+      --shadow: 0 20px 50px rgba(0,0,0,.28);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; min-height: 100%; }
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top, var(--bg1), var(--bg2) 58%, var(--bg3));
+    }
+
+    .app {
+      max-width: 980px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      backdrop-filter: blur(8px);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .34em;
+      color: rgba(255,255,255,.45);
+      margin-bottom: 4px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .badge {
+      min-width: 90px;
+      padding: 8px 10px;
+      border-radius: 14px;
+      background: rgba(246,210,122,.18);
+      color: #fff4c9;
+      text-align: center;
+      border: 1px solid rgba(246,210,122,.14);
+    }
+
+    .badge small {
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .2em;
+      color: rgba(255,255,255,.5);
+      margin-bottom: 4px;
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: .16s ease;
+      font: inherit;
+    }
+
+    button:hover { background: rgba(255,255,255,.14); transform: translateY(-1px); }
+    button:disabled { opacity: .45; cursor: default; transform: none; }
+
+    .portrait-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .portrait-card { padding: 8px; }
+
+    .portrait-label {
+      text-align: center;
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.84);
+      margin-bottom: 4px;
+    }
+
+    .portrait {
+      position: relative;
+      height: min(27vh, 280px);
+      min-height: 170px;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.08);
+      background:
+        radial-gradient(circle at 50% 14%, rgba(255,255,255,.12), transparent 34%),
+        linear-gradient(180deg, rgba(255,255,255,.06), transparent 28%, rgba(0,0,0,.28));
+    }
+
+    .portrait svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .emotion {
+      position: absolute;
+      right: 8px;
+      bottom: 6px;
+      font-size: 18px;
+    }
+
+    .main {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 12px;
+      flex: 1;
+    }
+
+    .phase {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .phase small {
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .3em;
+      color: rgba(255,255,255,.45);
+      margin-bottom: 4px;
+    }
+
+    .phase strong {
+      font-size: 18px;
+    }
+
+    .log {
+      min-height: 170px;
+      max-height: 220px;
+      overflow-y: auto;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(0,0,0,.22);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bubble {
+      max-width: 94%;
+      border-radius: 15px;
+      padding: 10px 12px;
+      line-height: 1.4;
+      font-size: 14px;
+    }
+
+    .bubble .speaker {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .22em;
+      color: rgba(255,255,255,.48);
+    }
+
+    .bubble.player { margin-left: auto; background: rgba(214,96,184,.18); }
+    .bubble.npc { margin-right: auto; background: rgba(255,255,255,.10); }
+    .bubble.system { margin: 0 auto; background: rgba(255,255,255,.08); color: rgba(255,255,255,.8); max-width: 96%; }
+
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .choice { text-align: left; min-height: 74px; }
+
+    .overlay,
+    .drawer {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .overlay.show,
+    .drawer.show { display: flex; }
+
+    .overlay {
+      pointer-events: none;
+      background: rgba(0,0,0,.72);
+      backdrop-filter: blur(6px);
+    }
+
+    .blur-scene {
+      position: relative;
+      width: min(80vw, 520px);
+      height: min(40vh, 320px);
+      border-radius: 22px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.1);
+      background: #20151f;
+    }
+
+    .blur-shape {
+      position: absolute;
+      border-radius: 2rem;
+      filter: blur(5px);
+    }
+
+    .drawer {
+      background: rgba(0,0,0,.62);
+      backdrop-filter: blur(8px);
+      padding: 16px;
+    }
+
+    .drawer-panel {
+      width: min(860px, 100%);
+      max-height: 82vh;
+      overflow: hidden;
+      border-radius: 22px;
+      background: rgba(23,17,26,.96);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .drawer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .drawer-body {
+      padding: 16px;
+      overflow-y: auto;
+      display: grid;
+      gap: 10px;
+    }
+
+    .entry {
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .entry-title { font-weight: 600; margin-bottom: 6px; }
+    .entry-sub { color: var(--muted); font-size: 14px; }
+    .good { color: var(--good); }
+    .bad { color: var(--bad); }
+
+    @media (max-width: 760px) {
+      .topbar { flex-direction: column; align-items: stretch; }
+      .top-actions { justify-content: flex-start; }
+      .portrait-grid { grid-template-columns: 1fr 1fr; }
+      .choices { grid-template-columns: 1fr; }
+      .portrait { min-height: 150px; height: 22vh; }
+      .log { max-height: 180px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="card topbar">
+      <div>
+        <div class="eyebrow">soirée parisienne</div>
+        <h1>Guy-Mauve tente sa chance</h1>
+      </div>
+      <div class="top-actions">
+        <div class="badge"><small>Score</small><span id="scoreValue">0</span></div>
+        <button id="historyBtn">Archives</button>
+        <button id="bestiaryBtn">Carnet</button>
+      </div>
+    </div>
+
+    <div class="portrait-grid">
+      <div class="card portrait-card">
+        <div class="portrait-label">Guy-Mauve</div>
+        <div class="portrait" id="playerPortrait"><div class="emotion" id="playerEmotion">❤️</div></div>
+      </div>
+      <div class="card portrait-card">
+        <div class="portrait-label" id="npcName">Viktoria</div>
+        <div class="portrait" id="npcPortrait"><div class="emotion" id="npcEmotion">😞</div></div>
+      </div>
+    </div>
+
+    <div class="card main">
+      <div class="phase">
+        <div>
+          <small>moment</small>
+          <strong id="phaseLabel">1 · première approche</strong>
+        </div>
+        <button id="restartBtn">Recommencer</button>
+      </div>
+
+      <div class="log" id="log"></div>
+      <div class="choices" id="choices"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="blur-scene">
+      <div class="blur-shape" style="left:16%;top:18%;width:24%;height:40%;transform:rotate(-18deg);background:#b074a5"></div>
+      <div class="blur-shape" style="left:36%;top:26%;width:28%;height:38%;transform:rotate(12deg);background:#e18ab0"></div>
+      <div class="blur-shape" style="right:18%;top:22%;width:24%;height:34%;transform:rotate(22deg);background:#d49b74"></div>
+      <div style="position:absolute;inset:auto 0 28px 0;text-align:center;font-weight:700;letter-spacing:.25em;color:rgba(255,255,255,.82)">FIN DE SOIRÉE FLOUTÉE</div>
+    </div>
+  </div>
+
+  <div class="drawer" id="drawer">
+    <div class="drawer-panel">
+      <div class="drawer-head">
+        <strong id="drawerTitle">Carnet</strong>
+        <button id="closeDrawerBtn">Fermer</button>
+      </div>
+      <div class="drawer-body" id="drawerBody"></div>
+    </div>
+  </div>
+
+  <script>
+    const INTRO_OPTIONS = [
+      { id: "o0", text: "Salut. J’allais rentrer, puis je t’ai vue, donc je me suis dit que ce serait dommage de pas venir te parler.", tag: "franchise" },
+      { id: "o1", text: "T’as l’air posée, mais pas chiante. J’avais envie de voir si la conversation suivait le regard.", tag: "mystere" },
+      { id: "o2", text: "Moi c’est Guy-Mauve. J’ai pas la tête d’un conte de fées, mais en vrai je m’en sors mieux que prévu.", tag: "sincerite" },
+    ];
+
+    const CONCLUSION_OPTIONS = [
+      { id: "c0", text: "On bouge d’ici ? J’ai pas très envie que ça s’arrête là." },
+      { id: "c1", text: "Viens, on rentre chez moi. On sera quand même mieux qu’ici." },
+      { id: "c2", text: "Viens avec moi maintenant. J’ai clairement pas envie qu’on se quitte tout de suite." },
+    ];
+
+    const FABRISTE_FINALS = [
+      { id: "f0", text: "la complète ?" },
+      { id: "f1", text: "pitié" },
+      { id: "f2", text: "fuite" },
+    ];
+
+    const EASTERN_NAMES = ["Zorya","Vesna","Milena","Aneta","Daria","Ivana","Nadja","Roksana","Ludmila","Tereza","Alina","Yelena","Magda","Katarina","Viktoria","Svetlana","Mirela","Dobrina","Ilona","Yveta"];
+    const HAIR_OPTIONS = [
+      { key: "blond-miel", label: "blonde miel", color: "#e8c56d" },
+      { key: "platine", label: "platine", color: "#efefef" },
+      { key: "brun-nuit", label: "brune nuit", color: "#36231a" },
+      { key: "chatain", label: "châtain fumé", color: "#6d4c41" },
+      { key: "roux-cuivre", label: "rousse cuivre", color: "#b45a2b" },
+      { key: "noir-encre", label: "noire d'encre", color: "#171717" },
+      { key: "auburn", label: "auburn", color: "#7a3e2b" },
+    ];
+    const FEMALE_HAIRSTYLES = ["long-layered","wavy-mid","bob-soft","high-pony","side-swept","voluminous-curl"];
+    const EYE_OPTIONS = [
+      { key: "bleu", label: "yeux bleus", color: "#7cc4ff" },
+      { key: "vert", label: "yeux verts", color: "#89d47a" },
+      { key: "noisette", label: "yeux noisette", color: "#b38352" },
+      { key: "gris", label: "yeux gris acier", color: "#c4c8d1" },
+      { key: "brun", label: "yeux bruns", color: "#6e4d33" },
+      { key: "ambre", label: "yeux ambre", color: "#d5a13d" },
+    ];
+    const FACE_OPTIONS = [
+      { key: "ovale", label: "visage ovale" },
+      { key: "coeur", label: "visage en cœur" },
+      { key: "carre", label: "visage carré" },
+      { key: "long", label: "visage long" },
+      { key: "triangle", label: "visage triangulaire" },
+    ];
+    const BODY_OPTIONS = [
+      { key: "fine", label: "silhouette fine" },
+      { key: "athletique", label: "silhouette athlétique" },
+      { key: "pulpeuse", label: "silhouette pulpeuse" },
+      { key: "elancee", label: "silhouette élancée" },
+      { key: "compacte", label: "silhouette compacte" },
+    ];
+    const FEMALE_OUTFITS = [
+      { key: "dress-midnight", type: "dress", colors: ["rgba(54,42,78,0.98)", "rgba(21,17,34,0.98)"], bust: "rgba(255,255,255,0.08)", skirt: "rgba(255,255,255,0.06)" },
+      { key: "dress-wine", type: "dress", colors: ["rgba(128,48,78,0.98)", "rgba(68,21,39,0.98)"], bust: "rgba(255,255,255,0.08)", skirt: "rgba(255,255,255,0.05)" },
+      { key: "dress-emerald", type: "dress", colors: ["rgba(49,108,92,0.98)", "rgba(20,53,44,0.98)"], bust: "rgba(255,255,255,0.08)", skirt: "rgba(255,255,255,0.05)" },
+      { key: "pants-tank-plum", type: "tank-pants", colors: ["rgba(145,92,151,0.98)", "rgba(58,34,77,0.98)"], bust: "rgba(255,255,255,0.1)", skirt: "rgba(255,255,255,0.08)" },
+      { key: "pants-tank-cobalt", type: "tank-pants", colors: ["rgba(64,88,154,0.98)", "rgba(29,38,82,0.98)"], bust: "rgba(255,255,255,0.09)", skirt: "rgba(255,255,255,0.08)" },
+      { key: "sweater-pants-champagne", type: "sweater-pants", colors: ["rgba(182,134,98,0.98)", "rgba(101,68,49,0.98)"], bust: "rgba(255,255,255,0.08)", skirt: "rgba(255,255,255,0.05)" },
+      { key: "sweater-pants-forest", type: "sweater-pants", colors: ["rgba(70,100,82,0.98)", "rgba(34,53,42,0.98)"], bust: "rgba(255,255,255,0.08)", skirt: "rgba(255,255,255,0.05)" },
+    ];
+    const ARCHETYPES = {
+      romantique: { likedTags: ["poetique", "tendresse", "mystere"], dislikedTags: ["beauf", "franchise", "lourdeur"] },
+      directe: { likedTags: ["franchise", "audace", "assurance"], dislikedTags: ["timide", "mystere", "poetique"] },
+      ironique: { likedTags: ["esprit", "mystere", "assurance"], dislikedTags: ["beauf", "tendresse", "lourdeur"] },
+      solaire: { likedTags: ["humour", "tendresse", "franchise"], dislikedTags: ["mystere", "luxe", "lourdeur"] },
+      luxueuse: { likedTags: ["luxe", "assurance", "audace"], dislikedTags: ["beauf", "timide", "humour"] },
+    };
+    const EMOJI = { desir: "❤️", joie: "✨", degout: "🙄", colere: "😠", tristesse: "😞" };
+
+    function uniqueStrings(items) { return [...new Set(items.map((s) => s.replace(/\s+/g, " ").trim()))]; }
+    function randomItem(items) { return items[Math.floor(Math.random() * items.length)]; }
+    function sampleUnique(items, count) {
+      const pool = [...items];
+      const picked = [];
+      while (pool.length && picked.length < count) {
+        const idx = Math.floor(Math.random() * pool.length);
+        picked.push(pool.splice(idx, 1)[0]);
+      }
+      return picked;
+    }
+    function colorForSkin(index) { return ["#f5d7be", "#f0cba9", "#e5b88c", "#d8a074", "#c6895f"][index % 5]; }
+    function computeArchetype(h,e,f,b) {
+      const keys = Object.keys(ARCHETYPES);
+      return keys[(h + e * 2 + f + b * 3) % keys.length];
+    }
+    function buildPool(specs, targetCount, prefix, level) {
+      const raw = [];
+      specs.forEach((spec) => {
+        spec.a.forEach((a) => spec.b.forEach((b) => spec.c.forEach((c) => raw.push({ text: `${a} ${b} ${c}`, tag: spec.tag }))));
+      });
+      return uniqueStrings(raw.map((item) => item.text)).slice(0, targetCount).map((text, index) => ({
+        id: `${prefix}${index}`,
+        text,
+        tag: raw.find((item) => item.text === text)?.tag || specs[0].tag,
+        level,
+      }));
+    }
+
+    const DISCREET_POOL = buildPool([
+      { tag: "poetique", a: ["T’as un truc", "Je sais pas pourquoi mais t’as un truc", "Il y a chez toi un côté", "Tu dégages un truc"], b: ["qui calme un peu tout", "qui fait redescendre le bruit", "qui rend l’endroit moins nul", "qui donne envie de rester cinq minutes de plus", "qui change l’ambiance"], c: ["et j’avais envie de venir voir ça de plus près.", "donc je suis venu te parler.", "et franchement ça valait le détour.", "alors j’ai tenté ma chance."] },
+      { tag: "esprit", a: ["Je te préviens,", "J’ai une théorie :", "Tu m’as l’air", "Je tente un pari :"], b: ["d’avoir de la répartie", "d’être plus drôle que la moitié de la salle", "de mal supporter les banalités", "d’être intéressante quand tu t’y mets"], c: ["et j’avais envie de vérifier.", "donc je viens tester ça.", "alors me voilà.", "et j’espère pas m’être trompé."] },
+      { tag: "tendresse", a: ["T’as pas l’air simple,", "Je vois un côté doux", "Il y a quelque chose chez toi", "Tu donnes une impression"], b: ["mais dans le bon sens", "sous le regard", "dans la manière de te tenir", "qui donne envie d’y revenir"], c: ["et c’est assez rare pour être remarqué.", "et j’avais pas envie de laisser passer ça.", "donc je suis venu sans trop réfléchir.", "et ça m’a donné envie de rester un peu."] },
+      { tag: "mystere", a: ["J’ai l’impression", "Tu me donnes l’impression", "On dirait", "En te regardant,"], b: ["qu’il y a plus que ce qu’on voit au premier regard", "que t’es pas si facile à lire", "que t’as une vraie version longue", "qu’on te résume mal en trente secondes"], c: ["et j’avais envie d’aller voir.", "alors j’ai tenté le coup.", "et ça m’a intrigué.", "donc je suis venu te parler."] },
+      { tag: "humour", a: ["J’avais pas prévu", "Honnêtement je comptais pas", "Ce soir j’étais censé être sage, mais", "C’était pas du tout le plan,"], b: ["de finir dans une conversation comme ça", "de venir parler à quelqu’un au hasard", "de me mettre dans ce genre de situation", "de me lancer sans réfléchir"], c: ["et pourtant me voilà.", "donc j’assume.", "et en vrai je regrette pas.", "alors autant y aller franchement."] },
+      { tag: "franchise", a: ["Je vais être honnête :", "On va éviter le détour :", "Version simple :", "Je te le dis direct :"], b: ["t’as attiré mon attention", "j’avais envie de venir te parler", "je te trouve vraiment jolie", "j’avais pas envie de laisser passer ça"], c: ["donc je suis venu.", "et je trouvais ça dommage de rien tenter.", "alors voilà.", "sans faire le malin."] },
+    ], 72, "d", "discreet");
+
+    const REAL_POOL = [
+      ...buildPool([
+        { tag: "audace", a: ["Quand tu me regardes comme ça,", "Là tout de suite,", "Je vais être un peu cash :", "On va pas se mentir :"], b: ["ça devient dur de faire semblant", "j’ai clairement envie de pousser un peu plus loin", "il se passe déjà un truc", "j’ai pas envie de rester dans la conversation polie"], c: ["et je crois que toi aussi tu le sens.", "et ça me plaît beaucoup.", "donc autant l’assumer.", "et j’ai pas spécialement envie de ralentir."] },
+        { tag: "assurance", a: ["J’aime pas laisser filer les bons moments,", "Je vais pas jouer au mec flou,", "Quand ça vaut le coup, j’y vais,", "Je préfère être clair maintenant,"], b: ["et là ça vaut le coup", "et t’es clairement pas le genre de rencontre qu’on oublie", "et j’ai envie de voir où ça peut aller", "et j’ai pas envie que ça s’arrête là"], c: ["alors j’assume.", "donc je te le dis franchement.", "et je préfère le dire au lieu de tourner autour.", "avant que le moment retombe."] },
+        { tag: "luxe", a: ["Franchement,", "Entre nous,", "Soyons sérieux deux minutes :", "Honnêtement,"], b: ["ce lieu te va pas", "on peut faire mieux que cette ambiance", "t’as rien à faire dans un décor pareil", "la suite mérite mieux que ça"], c: ["et j’ai bien envie de te sortir de là.", "alors autant viser un peu mieux.", "parce que ça manque clairement de niveau.", "et je pense qu’on serait mieux ailleurs."] },
+        { tag: "esprit", a: ["Le vrai problème avec toi,", "Tu sais ce qui m’embête là ?", "Le souci, maintenant,", "Je vais te dire le fond du truc :"], b: ["c’est que le reste de la salle devient très fade", "c’est que je commence à trouver cette conversation trop bien", "c’est que t’as rendu tout le reste assez inutile", "c’est que j’ai déjà envie de la suite"], c: ["et c’est pas hyper raisonnable.", "mais franchement tant pis.", "donc je vais arrêter de faire semblant.", "et j’ai bien envie de voir où ça mène."] },
+        { tag: "tendresse", a: ["Sous ma tête fatiguée,", "J’ai l’air un peu cassé, mais", "Je fais le dur, mais", "Je vais te dire un truc un peu sincère :"], b: ["j’ai envie d’être bien avec toi", "j’ai envie de te garder un peu avec moi", "tu me donnes envie de ralentir", "j’ai envie que la soirée devienne plus douce"], c: ["et ça m’arrive pas si souvent.", "donc je préfère te le dire.", "et c’est plutôt bon signe.", "alors je vais pas faire semblant que non."] },
+        { tag: "franchise", a: ["Je vais arrêter de tourner autour :", "Bon, on va être clairs :", "Je te le dis franchement :", "Allez, version honnête :"], b: ["j’ai envie de continuer la nuit avec toi", "j’ai pas envie qu’on se quitte là", "tu me plais vraiment", "j’ai envie de voir ce que ça donne loin du bruit"], c: ["et voilà.", "donc je tente.", "sans emballage inutile.", "et tant pis si c’est trop direct."] },
+      ], 72, "r", "real"),
+      ...[
+        "T’as ce genre de style qui donne envie d’annuler sa dignité pour cinq minutes de plus.",
+        "Je suis pas spécialement une bonne idée, mais là j’ai l’impression d’être la moins mauvaise du coin.",
+        "Toi, t’es typiquement la personne qui me ferait rater mon dernier métro sans débat.",
+        "Si tu continues à me regarder comme ça, je vais finir par croire à mes propres conneries.",
+        "Franchement, entre toi et moi, le bon goût est déjà en train de décrocher.",
+        "J’ai connu des soirées plus calmes, mais rarement quelqu’un qui me donne autant envie de les gâcher bien.",
+        "T’as un truc qui donne envie de prendre de mauvaises décisions avec le sourire.",
+        "Si on finit mal, au moins on aura fini avec panache.",
+        "T’as l’air trop bien pour moi, mais j’ai jamais été très discipliné sur ce sujet.",
+        "Là, tout de suite, j’ai surtout envie de voir à quel point t’es une mauvaise idée.",
+        "Tu me donnes envie de faire n’importe quoi, mais proprement.",
+        "Je te jure que j’essaye d’être normal, mais avec toi c’est mal parti.",
+        "T’as le genre d’allure qui fait monter le niveau et baisser la lucidité.",
+        "Entre ton regard et ma soirée bancale, y a peut-être un truc à sauver.",
+        "Si on était raisonnables, on se parlerait cinq minutes et on rentrerait. Heureusement, on n’a pas l’air raisonnables.",
+        "Tu me donnes envie d’arrêter d’être poli, et c’est plutôt bon signe.",
+        "Je suis venu pour boire un verre, pas pour avoir envie de toi comme ça.",
+        "Là, t’es en train de me donner de très mauvaises idées, et franchement merci.",
+        "Tu rends l’endroit plus beau, ce qui est chiant parce qu’il était vraiment pas terrible.",
+        "Je suis presque sûr qu’on peut faire mieux que rester plantés là à parler comme des gens sages.",
+      ].map((text, i) => ({ id: `b${i}`, text, tag: "beauf", level: "real" }))
+    ];
+
+    const ALL_FLIRT_OPTIONS = [...DISCREET_POOL, ...REAL_POOL];
+    const INSULTING_REJECTIONS = [
+      "Franchement, non. Là tu me fatigues plus qu’autre chose.",
+      "T’as cru que ça allait marcher avec une vibe pareille ?",
+      "On va gagner du temps : c’est non.",
+      "J’ai déjà vu plus séduisant dans une rame à 8h du mat.",
+      "Tu parles beaucoup pour quelqu’un qui n’a aucune chance.",
+      "Là t’es pas charmant, t’es juste gênant.",
+      "J’ai connu des tickets de caisse plus inspirants.",
+      "Non mais regarde-toi deux secondes.",
+      "Même mon pire date avait plus de tenue que ça.",
+      "Tu vas me laisser finir mon verre tranquillement, merci.",
+    ];
+    const ALL_REJECTIONS = [...INSULTING_REJECTIONS, ...Array.from({ length: 290 }, (_, i) => `Non. Là, ça prend pas du tout. Rejet ${i + 1}.`)].slice(0, 300);
+
+    function getReply(pnj, tone) {
+      if (pnj.isFabrist) return randomItem([
+        "FABRISTE valide tout, avec beaucoup trop d’enthousiasme.",
+        "FABRISTE est déjà conquis. Beaucoup trop vite.",
+        "FABRISTE approuve, et c’est presque inquiétant.",
+      ]);
+      return randomItem(({
+        intro: ["Ok, je t’écoute.", "Bon. T’as réussi à lancer la conversation.", "Vas-y, voyons ce que t’as."],
+        positive: ["Pas mal.", "Là, c’est mieux.", "Ok, continue comme ça."],
+        negative: ["Non, là c’est mauvais.", "Tu viens de perdre du terrain.", "Ouais non, pas celle-là."],
+        neutral: ["Je vois l’idée.", "Mouais. Continue.", "Je suis pas encore convaincue."],
+        unlock: ["Ok. Là, tu peux tenter un truc.", "Bon, t’as remonté ton niveau.", "Vas-y, propose la suite."],
+        final: ["Allez, je t’écoute.", "Vas-y, joue-la bien.", "Ne gâche pas tout maintenant."],
+      })[tone] || ["..."]);
+    }
+
+    function npcEmotionFromTone(tone, isFabrist = false) {
+      if (isFabrist) return tone === "unlock" || tone === "final" ? "desir" : "joie";
+      if (tone === "positive") return "joie";
+      if (tone === "unlock" || tone === "final" || tone === "intro") return "desir";
+      if (tone === "negative") return "degout";
+      return "tristesse";
+    }
+    function playerEmotionFromTone(tone) { return tone === "negative" ? "tristesse" : tone === "positive" ? "joie" : "desir"; }
+    function pickRejectText(harsh = false) { return harsh ? randomItem(INSULTING_REJECTIONS) : randomItem(ALL_REJECTIONS); }
+
+    function createCharacter(forceFabrist = false) {
+      if (forceFabrist) {
+        return {
+          id: `fab-${Date.now()}`,
+          name: "FABRISTE",
+          isFabrist: true,
+          hair: { color: "#b48a68" },
+          eyes: { color: "#d0d4de" },
+          face: { key: "carre" },
+          body: { key: "massif" },
+          skin: "#c98d67",
+          allowedOpener: null,
+          preferredConclusion: null,
+          likedTags: [...ARCHETYPES.directe.likedTags],
+          dislikedTags: [],
+          greenFlagIds: new Set(ALL_FLIRT_OPTIONS.map((line) => line.id)),
+          redFlagIds: new Set(),
+          greenUltimate: null,
+          redUltimate: null,
+          signature: "FABRISTE",
+        };
+      }
+
+      const h = Math.floor(Math.random() * HAIR_OPTIONS.length);
+      const e = Math.floor(Math.random() * EYE_OPTIONS.length);
+      const f = Math.floor(Math.random() * FACE_OPTIONS.length);
+      const b = Math.floor(Math.random() * BODY_OPTIONS.length);
+      const hair = HAIR_OPTIONS[h];
+      const eyes = EYE_OPTIONS[e];
+      const face = FACE_OPTIONS[f];
+      const body = BODY_OPTIONS[b];
+      const archetypeKey = computeArchetype(h, e, f, b);
+      const archetype = ARCHETYPES[archetypeKey];
+      const likedCandidates = ALL_FLIRT_OPTIONS.filter((line) => archetype.likedTags.includes(line.tag || ""));
+      const dislikedCandidates = ALL_FLIRT_OPTIONS.filter((line) => archetype.dislikedTags.includes(line.tag || ""));
+      const neutralCandidates = ALL_FLIRT_OPTIONS.filter((line) => !archetype.likedTags.includes(line.tag || "") && !archetype.dislikedTags.includes(line.tag || ""));
+      const greenFlags = sampleUnique([...likedCandidates, ...neutralCandidates], 8);
+      const redFlags = sampleUnique([...dislikedCandidates, ...neutralCandidates], 8);
+      const greenUltimateCandidates = likedCandidates.filter((line) => line.level === "real");
+      const greenUltimate = randomItem(greenUltimateCandidates.length ? greenUltimateCandidates : REAL_POOL);
+      const redUltimate = randomItem(dislikedCandidates.length ? dislikedCandidates : ALL_FLIRT_OPTIONS);
+
+      return {
+        id: `pnj-${Date.now()}-${Math.floor(Math.random() * 99999)}`,
+        name: randomItem(EASTERN_NAMES),
+        isFabrist: false,
+        hairstyle: randomItem(FEMALE_HAIRSTYLES),
+        outfit: randomItem(FEMALE_OUTFITS),
+        hair,
+        eyes,
+        face,
+        body,
+        skin: colorForSkin(h + e + f),
+        allowedOpener: (h + e + f) % 3,
+        preferredConclusion: (e + b + f) % 3,
+        likedTags: archetype.likedTags,
+        dislikedTags: archetype.dislikedTags,
+        greenFlagIds: new Set(greenFlags.filter((line) => line.id !== redUltimate.id).map((line) => line.id)),
+        redFlagIds: new Set(redFlags.filter((line) => line.id !== greenUltimate.id).map((line) => line.id)),
+        greenUltimate,
+        redUltimate,
+        signature: `${hair.label} • ${eyes.label} • ${face.label} • ${body.label}`,
+      };
+    }
+
+    const state = {
+      score: 0,
+      bestiary: [],
+      history: [],
+      drawer: null,
+      overlay: false,
+      current: null,
+      stage: "opening",
+      greens: 0,
+      reds: 0,
+      discreetTurns: 0,
+      choices: [...INTRO_OPTIONS],
+      log: [],
+      status: "active",
+      playerEmotion: "desir",
+      npcEmotion: "tristesse",
+    };
+
+    const els = {
+      scoreValue: document.getElementById('scoreValue'),
+      npcName: document.getElementById('npcName'),
+      playerPortrait: document.getElementById('playerPortrait'),
+      npcPortrait: document.getElementById('npcPortrait'),
+      playerEmotion: document.getElementById('playerEmotion'),
+      npcEmotion: document.getElementById('npcEmotion'),
+      phaseLabel: document.getElementById('phaseLabel'),
+      restartBtn: document.getElementById('restartBtn'),
+      log: document.getElementById('log'),
+      choices: document.getElementById('choices'),
+      overlay: document.getElementById('overlay'),
+      drawer: document.getElementById('drawer'),
+      drawerTitle: document.getElementById('drawerTitle'),
+      drawerBody: document.getElementById('drawerBody'),
+      closeDrawerBtn: document.getElementById('closeDrawerBtn'),
+      historyBtn: document.getElementById('historyBtn'),
+      bestiaryBtn: document.getElementById('bestiaryBtn'),
+    };
+
+    function addLog(speaker, text) {
+      state.log = [...state.log, { speaker, text }].slice(-14);
+      renderLog();
+    }
+
+    function makeInitialLog(pnj) {
+      return [
+        { speaker: 'system', text: pnj.isFabrist ? 'Score en vrille : FABRISTE débarque.' : `${pnj.name} entre dans ton champ de vision.` },
+        { speaker: pnj.name, text: pnj.isFabrist ? 'FABRISTE te mate avec un enthousiasme très inquiétant.' : 'Elle te regarde. À toi d’ouvrir.' },
+      ];
+    }
+
+    function setupEncounter(nextScore = state.score) {
+      const next = createCharacter(nextScore <= -3);
+      state.current = next;
+      state.stage = 'opening';
+      state.greens = 0;
+      state.reds = 0;
+      state.discreetTurns = 0;
+      state.choices = [...INTRO_OPTIONS];
+      state.log = makeInitialLog(next);
+      state.status = 'active';
+      state.playerEmotion = 'desir';
+      state.npcEmotion = next.isFabrist ? 'joie' : 'tristesse';
+      state.overlay = false;
+      render();
+    }
+
+    function rememberBestiary(pnj) {
+      if (pnj.isFabrist) return;
+      const existing = state.bestiary.find((e) => e.signature === pnj.signature);
+      if (existing) existing.wins += 1;
+      else state.bestiary.unshift({ signature: pnj.signature, likedTags: pnj.likedTags, dislikedTags: pnj.dislikedTags, wins: 1 });
+    }
+
+    function recordHistory(pnj, outcome, delta, finalScore) {
+      state.history.unshift({ id: `${pnj.id}-${Date.now()}`, name: pnj.name, signature: pnj.signature, outcome, delta, finalScore });
+      state.history = state.history.slice(0, 18);
+    }
+
+    function playTurtleScreams() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+        for (let i = 0; i < 5; i++) {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = i % 2 === 0 ? 'square' : 'sawtooth';
+          osc.frequency.setValueAtTime(420 + i * 60, now + i * 0.18);
+          osc.frequency.exponentialRampToValueAtTime(900 + i * 40, now + i * 0.26);
+          gain.gain.setValueAtTime(0.0001, now + i * 0.18);
+          gain.gain.exponentialRampToValueAtTime(0.045, now + i * 0.2);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.32);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now + i * 0.18);
+          osc.stop(now + i * 0.33);
+        }
+      } catch {}
+    }
+
+    function loseEncounter(reason, harsh = false, npcMood = null) {
+      const nextScore = state.score - 1;
+      state.score = nextScore;
+      state.status = 'lost';
+      state.playerEmotion = 'tristesse';
+      state.npcEmotion = npcMood || (harsh ? 'colere' : 'degout');
+      addLog(state.current.name, reason || pickRejectText(harsh));
+      addLog('system', 'Raté. -1 point.');
+      recordHistory(state.current, 'échec', -1, nextScore);
+      render();
+    }
+
+    function winEncounter() {
+      const nextScore = state.score + 2;
+      state.score = nextScore;
+      state.status = 'won';
+      state.playerEmotion = 'joie';
+      state.npcEmotion = state.current.isFabrist ? 'joie' : 'desir';
+      addLog(state.current.name, state.current.isFabrist ? 'FABRISTE valide tout, dans un mélange de désir et de chaos.' : 'Ok. Cette fois, elle vient avec toi.');
+      addLog('system', '+2 points, bien joué.');
+      recordHistory(state.current, 'conclusion', 2, nextScore);
+      rememberBestiary(state.current);
+      state.overlay = true;
+      render();
+      playTurtleScreams();
+      setTimeout(() => {
+        state.overlay = false;
+        render();
+      }, 2600);
+    }
+
+    function evaluateFlirt(choice) {
+      if (state.current.isFabrist) {
+        const nextGreens = state.greens + 1;
+        state.greens = nextGreens;
+        state.playerEmotion = nextGreens >= 3 ? 'joie' : 'desir';
+        state.npcEmotion = nextGreens >= 3 ? 'desir' : 'joie';
+        addLog(state.current.name, getReply(state.current, nextGreens >= 3 ? 'unlock' : 'positive'));
+        if (nextGreens >= 3) {
+          state.stage = 'conclusion';
+          state.choices = [...FABRISTE_FINALS];
+        } else if (state.stage === 'discreet') {
+          const nextTurns = state.discreetTurns + 1;
+          state.discreetTurns = nextTurns;
+          state.choices = nextTurns >= 2 ? sampleUnique(REAL_POOL, 3) : sampleUnique(DISCREET_POOL, 3);
+          if (nextTurns >= 2) state.stage = 'real';
+        } else {
+          state.choices = state.stage === 'real' ? sampleUnique(REAL_POOL, 3) : sampleUnique(DISCREET_POOL, 3);
+        }
+        render();
+        return;
+      }
+
+      if (state.current.redUltimate && choice.id === state.current.redUltimate.id) {
+        loseEncounter(pickRejectText(true), true);
+        return;
+      }
+
+      let deltaGreen = 0;
+      let deltaRed = 0;
+      let tone = 'neutral';
+      let unlockConclusion = false;
+
+      if (state.current.greenUltimate && choice.id === state.current.greenUltimate.id) {
+        deltaGreen = 2;
+        tone = 'unlock';
+        unlockConclusion = true;
+      } else if (state.current.greenFlagIds.has(choice.id) || state.current.likedTags.includes(choice.tag || '')) {
+        deltaGreen = 1;
+        tone = 'positive';
+      } else if (state.current.redFlagIds.has(choice.id) || state.current.dislikedTags.includes(choice.tag || '')) {
+        deltaRed = 1;
+        tone = 'negative';
+      }
+
+      state.greens += deltaGreen;
+      state.reds += deltaRed;
+      state.playerEmotion = playerEmotionFromTone(unlockConclusion ? 'unlock' : tone);
+      state.npcEmotion = npcEmotionFromTone(unlockConclusion ? 'unlock' : tone, state.current.isFabrist);
+      addLog(state.current.name, getReply(state.current, unlockConclusion ? 'unlock' : tone));
+
+      if (state.reds - state.greens >= 6) {
+        loseEncounter(pickRejectText(deltaRed > 0), deltaRed > 0);
+        return;
+      }
+
+      if (unlockConclusion || state.greens >= 3) {
+        state.stage = 'conclusion';
+        state.choices = [...CONCLUSION_OPTIONS];
+        addLog(state.current.name, getReply(state.current, 'final'));
+        render();
+        return;
+      }
+
+      if (state.stage === 'discreet') {
+        const nextTurns = state.discreetTurns + 1;
+        state.discreetTurns = nextTurns;
+        if (nextTurns >= 2) {
+          state.stage = 'real';
+          state.choices = sampleUnique(REAL_POOL, 3);
+        } else {
+          state.choices = sampleUnique(DISCREET_POOL, 3);
+        }
+        render();
+        return;
+      }
+
+      state.choices = sampleUnique(REAL_POOL, 3);
+      render();
+    }
+
+    function choose(choice) {
+      if (state.status !== 'active') return;
+      addLog('Guy-Mauve', choice.text);
+
+      if (state.stage === 'opening') {
+        const goodOpening = state.current.isFabrist || choice.id === `o${state.current.allowedOpener}`;
+        if (!goodOpening) {
+          loseEncounter(pickRejectText(true), true, 'colere');
+          return;
+        }
+        state.playerEmotion = 'desir';
+        state.npcEmotion = state.current.isFabrist ? 'joie' : 'desir';
+        addLog(state.current.name, getReply(state.current, 'intro'));
+        state.stage = 'discreet';
+        state.choices = sampleUnique(DISCREET_POOL, 3);
+        render();
+        return;
+      }
+
+      if (state.stage === 'conclusion') {
+        if (state.current.isFabrist) {
+          winEncounter();
+          return;
+        }
+        if (choice.id === `c${state.current.preferredConclusion}`) {
+          winEncounter();
+          return;
+        }
+        const diff = state.reds - state.greens;
+        if (diff >= 2) {
+          loseEncounter(pickRejectText(true), true, 'degout');
+          return;
+        }
+        state.reds += 1;
+        state.playerEmotion = 'tristesse';
+        state.npcEmotion = 'degout';
+        addLog(state.current.name, 'Pas encore. Reviens avec quelque chose de mieux si tu veux me faire bouger.');
+        if (state.reds - state.greens >= 6) {
+          loseEncounter(pickRejectText(true), true);
+          return;
+        }
+        state.stage = 'real';
+        state.choices = sampleUnique(REAL_POOL, 3);
+        render();
+        return;
+      }
+
+      evaluateFlirt(choice);
+    }
+
+    function phaseLabel() {
+      return {
+        opening: '1 · première approche',
+        discreet: '2 · léger flirt',
+        real: '3 · ça chauffe',
+        conclusion: '4 · proposition'
+      }[state.stage];
+    }
+
+    function renderLog() {
+      els.log.innerHTML = '';
+      state.log.forEach((entry, index) => {
+        const bubble = document.createElement('div');
+        bubble.className = `bubble ${entry.speaker === 'Guy-Mauve' ? 'player' : entry.speaker === 'system' ? 'system' : 'npc'}`;
+        bubble.innerHTML = `<span class="speaker">${entry.speaker}</span>${entry.text}`;
+        els.log.appendChild(bubble);
+      });
+      els.log.scrollTop = els.log.scrollHeight;
+    }
+
+    function drawPortrait(container, character, isPlayer, emotion) {
+      const eyeColor = character.eyes?.color || '#d4d8df';
+      const hairColor = character.hair?.color || '#6d4c41';
+      const skin = character.skin || '#d7aa84';
+      const isFabrist = !!character.isFabrist;
+      const isNpcWoman = !isPlayer && !isFabrist;
+      const outfit = character.outfit || { colors: ['rgba(137,88,144,0.98)','rgba(64,38,87,0.98)'], bust: 'rgba(255,255,255,.08)', skirt: 'rgba(255,255,255,.06)', type: 'dress' };
+      const clothing = isFabrist ? ['rgba(242,185,142,.98)','rgba(152,92,68,.98)'] : isPlayer ? ['rgba(61,61,72,.98)','rgba(21,21,28,.98)'] : outfit.colors;
+      const mouth = {
+        desir: 'M34 75 Q50 84 66 75',
+        joie: 'M31 72 Q50 90 69 72',
+        degout: 'M34 77 Q48 69 67 71',
+        colere: 'M34 78 Q50 73 66 78',
+        tristesse: 'M33 81 Q50 71 67 81'
+      }[emotion] || 'M34 75 Q50 84 66 75';
+      const eyeY = { desir: 55, joie: 54, degout: 56, colere: 56, tristesse: 57 }[emotion] || 55;
+      const eyeScale = { desir: .72, joie: .9, degout: .52, colere: .46, tristesse: .72 }[emotion] || .72;
+      const headW = isPlayer ? 58 : isFabrist ? 58 : 60;
+      const headH = isPlayer ? 70 : isFabrist ? 64 : 72;
+      const torsoW = isPlayer ? 68 : isFabrist ? 86 : 66;
+      const torsoH = isPlayer ? 64 : isFabrist ? 68 : 62;
+
+      container.innerHTML = `
+        <svg viewBox="0 0 260 260" aria-hidden="true">
+          <defs>
+            <linearGradient id="body-${character.id}" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="${clothing[0]}"/>
+              <stop offset="100%" stop-color="${clothing[1]}"/>
+            </linearGradient>
+          </defs>
+          <ellipse cx="130" cy="235" rx="44" ry="10" fill="rgba(0,0,0,.18)"/>
+          <rect x="125" y="118" width="10" height="12" rx="4" fill="${skin}"/>
+          <g>
+            <rect x="${130 - torsoW/2}" y="${180 - torsoH}" width="${torsoW}" height="${torsoH}" rx="26" fill="url(#body-${character.id})" />
+            ${isNpcWoman ? `<path d="M${130 - torsoW/2} ${180 - torsoH} L${130 + torsoW/2} ${180 - torsoH} L${130 + torsoW*0.34} 180 L${130 - torsoW*0.34} 180 Z" fill="url(#body-${character.id})" />` : ''}
+            ${isNpcWoman && outfit.type === 'dress' ? `<ellipse cx="130" cy="136" rx="18" ry="9" fill="${outfit.bust}"/><ellipse cx="130" cy="168" rx="28" ry="16" fill="${outfit.skirt}"/>` : ''}
+            ${isNpcWoman && outfit.type === 'tank-pants' ? `<rect x="113" y="127" width="34" height="14" rx="6" fill="${outfit.bust}"/><rect x="114" y="157" width="12" height="23" rx="4" fill="${outfit.skirt}"/><rect x="134" y="157" width="12" height="23" rx="4" fill="${outfit.skirt}"/>` : ''}
+            ${isNpcWoman && outfit.type === 'sweater-pants' ? `<rect x="108" y="124" width="44" height="18" rx="8" fill="${outfit.bust}"/><rect x="112" y="157" width="13" height="23" rx="4" fill="${outfit.skirt}"/><rect x="135" y="157" width="13" height="23" rx="4" fill="${outfit.skirt}"/>` : ''}
+          </g>
+          <g>
+            ${isNpcWoman ? `<path d="M96 94 q34 -30 68 0 v40 h-18 v-28 q-6 -10 -16 -13 v41 h-12 v-41 q-10 3 -16 13 v28 h-18 z" fill="${hairColor}" opacity=".98"/>` : ''}
+            ${isPlayer ? `<path d="M100 96 q18 -18 58 -6 q6 2 10 8 v8 h-68 z" fill="${hairColor}"/><path d="M112 90 q12 -10 30 -7 q9 2 15 8 q-11 -3 -20 -3 q-12 0 -25 2 z" fill="${hairColor}" opacity=".96"/>` : ''}
+            ${isFabrist ? '' : ''}
+          </g>
+          <g>
+            <rect x="${130 - headW/2}" y="${122 - headH}" width="${headW}" height="${headH}" rx="22" fill="${skin}" stroke="rgba(0,0,0,.08)" />
+            <ellipse cx="130" cy="68" rx="16" ry="6" fill="rgba(255,255,255,.08)"/>
+            <ellipse cx="109" cy="92" rx="8" ry="6.2" fill="rgba(255,255,255,.94)"/>
+            <ellipse cx="151" cy="92" rx="8" ry="6.2" fill="rgba(255,255,255,.94)"/>
+            <ellipse cx="109" cy="${eyeY + 36}" rx="4" ry="4.2" fill="${eyeColor}" transform="translate(0 -36) scale(1 ${eyeScale}) translate(0 36)"/>
+            <ellipse cx="151" cy="${eyeY + 36}" rx="4" ry="4.2" fill="${eyeColor}" transform="translate(0 -36) scale(1 ${eyeScale}) translate(0 36)"/>
+            <circle cx="109" cy="${eyeY + 36}" r="1.6" fill="rgba(0,0,0,.75)" transform="translate(0 -36)"/>
+            <circle cx="151" cy="${eyeY + 36}" r="1.6" fill="rgba(0,0,0,.75)" transform="translate(0 -36)"/>
+            <path d="M100 79 L117 77" stroke="rgba(0,0,0,.52)" stroke-width="3" stroke-linecap="round"/>
+            <path d="M143 77 L160 79" stroke="rgba(0,0,0,.52)" stroke-width="3" stroke-linecap="round"/>
+            <path d="M128 93 Q133 104 129 112" stroke="rgba(0,0,0,.16)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="${mouth.replace(/M(\d+)/, (_, n) => 'M' + (parseInt(n)+75)).replace(/Q(\d+)/, (_, n) => 'Q' + (parseInt(n)+80)).replace(/(\d+) 84/, '130 120').replace(/(\d+) 75$/, '141 112')}" fill="none" stroke="${isNpcWoman ? 'rgba(126,46,86,.82)' : 'rgba(79,34,41,.78)'}" stroke-width="2.8" stroke-linecap="round"/>
+            ${isNpcWoman ? `<ellipse cx="94" cy="108" rx="6.5" ry="4" fill="rgba(244,114,182,.24)"/><ellipse cx="166" cy="108" rx="6.5" ry="4" fill="rgba(244,114,182,.24)"/>` : ''}
+            ${isFabrist ? `<path d="M111 105 q6 12 0 22" stroke="#4e2f1b" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M149 105 q-6 12 0 22" stroke="#4e2f1b" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M112 118 q18 12 36 0" stroke="#4e2f1b" stroke-width="10" fill="none" stroke-linecap="round"/>` : ''}
+          </g>
+        </svg>`;
+    }
+
+    function renderChoices() {
+      els.choices.innerHTML = '';
+      state.choices.forEach((choice) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice';
+        btn.textContent = choice.text;
+        btn.disabled = state.status !== 'active';
+        btn.addEventListener('click', () => choose(choice));
+        els.choices.appendChild(btn);
+      });
+    }
+
+    function renderDrawer() {
+      const open = !!state.drawer;
+      els.drawer.classList.toggle('show', open);
+      if (!open) return;
+      els.drawerTitle.textContent = state.drawer === 'bestiary' ? 'Carnet' : 'Archives';
+      els.drawerBody.innerHTML = '';
+      if (state.drawer === 'bestiary') {
+        if (!state.bestiary.length) {
+          els.drawerBody.innerHTML = '<div class="entry"><div class="entry-sub">Le carnet se remplit seulement après une vraie conclusion.</div></div>';
+          return;
+        }
+        state.bestiary.forEach((entry) => {
+          const el = document.createElement('div');
+          el.className = 'entry';
+          el.innerHTML = `<div class="entry-title">${entry.signature}</div><div class="entry-sub"><span class="good">Aime :</span> ${entry.likedTags.join(', ')}</div><div class="entry-sub" style="margin-top:6px"><span class="bad">Supporte pas :</span> ${entry.dislikedTags.join(', ')}</div>`;
+          els.drawerBody.appendChild(el);
+        });
+      } else {
+        if (!state.history.length) {
+          els.drawerBody.innerHTML = '<div class="entry"><div class="entry-sub">Aucune rencontre gardée en mémoire.</div></div>';
+          return;
+        }
+        state.history.forEach((item) => {
+          const el = document.createElement('div');
+          el.className = 'entry';
+          el.innerHTML = `<div style="display:flex;justify-content:space-between;gap:12px"><div class="entry-title">${item.name}</div><div class="${item.delta > 0 ? 'good' : 'bad'}">${item.delta > 0 ? '+' : ''}${item.delta}</div></div><div class="entry-sub">${item.signature}</div>`;
+          els.drawerBody.appendChild(el);
+        });
+      }
+    }
+
+    function render() {
+      els.scoreValue.textContent = String(state.score);
+      els.npcName.textContent = state.current?.name || '—';
+      els.playerEmotion.textContent = EMOJI[state.playerEmotion] || '❤️';
+      els.npcEmotion.textContent = EMOJI[state.npcEmotion] || '😞';
+      els.phaseLabel.textContent = phaseLabel();
+      els.restartBtn.textContent = state.status === 'active' ? 'Recommencer' : state.score <= -3 ? 'FABRISTE' : 'Nouvelle rencontre';
+      els.overlay.classList.toggle('show', state.overlay);
+      renderLog();
+      renderChoices();
+      renderDrawer();
+      drawPortrait(els.playerPortrait, {
+        name: 'Guy-Mauve', id: 'guy', isFabrist: false, face: { key: 'ovale' }, body: { key: 'compacte' }, skin: '#e2b28a', hair: { key: 'brun-nuit', color: '#4a2b20' }, eyes: { color: '#8fa6c8' }
+      }, true, state.playerEmotion);
+      drawPortrait(els.npcPortrait, state.current, false, state.npcEmotion);
+    }
+
+    els.restartBtn.addEventListener('click', () => setupEncounter(state.score));
+    els.historyBtn.addEventListener('click', () => { state.drawer = 'history'; renderDrawer(); });
+    els.bestiaryBtn.addEventListener('click', () => { state.drawer = 'bestiary'; renderDrawer(); });
+    els.closeDrawerBtn.addEventListener('click', () => { state.drawer = null; renderDrawer(); });
+    els.drawer.addEventListener('click', (e) => { if (e.target === els.drawer) { state.drawer = null; renderDrawer(); } });
+
+    setupEncounter(0);
+  </script>
+</body>
+</html>
